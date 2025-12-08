@@ -1,23 +1,32 @@
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.4
     container_name: elasticsearch
-    #build: .
+    environment:
+      node.name: es01
+      cluster.name: elasticsearch
+      discovery.type: single-node
+      bootstrap.memory_lock: "true"
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "false"
+      xpack.security.transport.ssl.enabled: "false"
+      ES_JAVA_OPTS: -Xmx1g -Xms1g
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-changeme}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     ports:
       - '9200:9200'
       - '9300:9300'
-    environment:
-      discovery.type: single-node
-      ES_JAVA_OPTS: -Xmx512m -Xms512m
-      node.name: es01
-      cluster.name: elasticsearch
     volumes:
-      - ./elastic/data:/usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data
     networks:
       - elasticnet
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.11.1
+    image: docker.elastic.co/kibana/kibana:8.19.4
     container_name: kibana
     ports:
       - '5601:5601'
@@ -25,13 +34,15 @@ services:
     environment:
       SERVERNAME: kibana
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      ES_JAVA_OPTS: -Xmx512m -Xms512m
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-changeme}
+      ES_JAVA_OPTS: -Xmx1g -Xms1g
     networks:
       - elasticnet
     depends_on:
       - elasticsearch
 volumes:
-  logvolume01: {}
+  esdata: {}
 
 networks:
   elasticnet: {}
