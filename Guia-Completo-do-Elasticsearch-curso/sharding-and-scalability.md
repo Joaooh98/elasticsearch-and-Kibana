@@ -349,3 +349,23 @@ Se quiser absorver o tema de forma pratica, siga esta ordem:
 - shard demais pode causar over-sharding
 - para pequenos e medios indices, `1` shard costuma bastar
 - para indices que vao crescer muito, vale pensar em mais shards no momento da criacao
+
+## O que voce sabe
+
+### How many shards are added to an index by default?
+
+`1`
+
+Desde o Elasticsearch 7, o padrao e `1` shard primario por indice.
+
+### What is a shard?
+
+A part of an index' data.
+
+Um shard e uma particao do indice, ou seja, uma parte dos dados desse indice.
+
+### How does Elasticsearch scale the volume of data?
+
+Ao usar o particionamento.
+
+Na pratica, isso acontece via sharding, dividindo um indice em partes menores para distribuir os dados.
